@@ -1,0 +1,161 @@
+import math
+
+# --- Module 1: Core Processing / Trend Calculation ---
+
+def calculate_stats(scores):
+    """Calculates mean, standard deviation, and final cumulative average."""
+    n = len(scores)
+    if n == 0:
+        return 0.0, 0.0, 0.0, []
+
+    # Calculate Mean
+    mean = sum(scores) / n
+
+    # Calculate Standard Deviation
+    variance = sum((x - mean) ** 2 for x in scores) / n
+    std_dev = math.sqrt(variance)
+
+    # Calculate Cumulative Average (Trend)
+    cumulative_avg = []
+    current_sum = 0
+    for i, score in enumerate(scores):
+        current_sum += score
+        cumulative_avg.append(current_sum / (i + 1))
+    
+    final_trend = cumulative_avg[-1]
+
+    return mean, std_dev, final_trend, cumulative_avg
+
+# --- Module 2: Reporting & Analytics (Text-Based Chart) ---
+
+def create_text_chart(data1, data2, trend1, trend2, name1, name2):
+    """Creates a simple ASCII line chart for the performance trend."""
+    
+    print("\n" + "="*50)
+    print("= TEXT-BASED TREND CHART (Cumulative Average) =")
+    print("="*50)
+    
+    # Combine all scores and trends to determine the scale
+    all_values = data1['Score'] + data2['Score'] + trend1 + trend2
+    min_val = 0
+    max_val = 100 # Assuming scores are always out of 100
+
+    # The maximum length of the chart line (e.g., 50 characters)
+    CHART_WIDTH = 50
+    
+    # Calculate the scale factor
+    scale_factor = CHART_WIDTH / (max_val - min_val)
+
+    # Determine the number of steps (assignments)
+    num_steps = max(len(data1['Assignment']), len(data2['Assignment']))
+
+    # Align data for printing
+    scores1_dict = dict(zip(data1['Assignment'], data1['Score']))
+    scores2_dict = dict(zip(data2['Assignment'], data2['Score']))
+    
+    print(f"Scale: [{min_val}]" + " "* (CHART_WIDTH // 2 - 3) + f"[50]" + " "* (CHART_WIDTH // 2 - 3) + f"[100]")
+    print(f"Legend: {name1} (Avg: {trend1[-1]:.1f}) = X | {name2} (Avg: {trend2[-1]:.1f}) = O")
+    print("-" * (CHART_WIDTH + 10))
+
+    # Print a line for each assignment
+    for i in range(1, num_steps + 1):
+        line = [" "] * CHART_WIDTH
+        
+        # Get data points for this assignment index (i)
+        trend_val1 = trend1[i-1] if i <= len(trend1) else None
+        trend_val2 = trend2[i-1] if i <= len(trend2) else None
+
+        # Place Student 1 marker ('X')
+        if trend_val1 is not None:
+            pos1 = int((trend_val1 - min_val) * scale_factor)
+            pos1 = max(0, min(CHART_WIDTH - 1, pos1)) # Clamp the position
+            line[pos1] = 'X'
+
+        # Place Student 2 marker ('O'). Avoid collision if possible.
+        if trend_val2 is not None:
+            pos2 = int((trend_val2 - min_val) * scale_factor)
+            pos2 = max(0, min(CHART_WIDTH - 1, pos2))
+            
+            # Simple collision check: if positions are the same, place next to it
+            if line[pos2] == 'X':
+                 # Try to place 'O' one step to the right
+                if pos2 < CHART_WIDTH - 1:
+                    line[pos2 + 1] = 'O'
+                else:
+                    line[pos2 - 1] = 'O'
+            else:
+                line[pos2] = 'O'
+
+        # Print the line
+        print(f"Assig {i:02d}: |{''.join(line)}|")
+
+    print("-" * (CHART_WIDTH + 10))
+
+
+# --- Main Logic (Clear Input/Output Structure) ---
+
+def compare_student_performance(student1_data, student2_data, student1_name="Student A", student2_name="Student B"):
+    """
+    Main tool function to process and report the comparison.
+    This function defines the logical workflow.
+    """
+    
+    # Sort data lists by assignment number for proper trend calculation
+    data1_list = sorted(zip(student1_data['Assignment'], student1_data['Score']))
+    scores1 = [item[1] for item in data1_list]
+    
+    data2_list = sorted(zip(student2_data['Assignment'], student2_data['Score']))
+    scores2 = [item[1] for item in data2_list]
+
+    # Calculate statistics and trend for both students
+    mean1, std_dev1, final_trend1, trend_list1 = calculate_stats(scores1)
+    mean2, std_dev2, final_trend2, trend_list2 = calculate_stats(scores2)
+
+    # Output 1: Detailed Statistical Reporting
+    print("=" * 70)
+    print("      STUDENT PERFORMANCE TREND COMPARISON REPORT")
+    print("=" * 70)
+    
+    print(f"\n[ Student: {student1_name} ]")
+    print(f"-> Mean Score (Overall Performance): {mean1:.2f}%")
+    print(f"-> Standard Deviation (Score Consistency): {std_dev1:.2f}")
+    print(f"-> Final Cumulative Average (Trend Index): {final_trend1:.2f}%")
+
+    print(f"\n[ Student: {student2_name} ]")
+    print(f"-> Mean Score (Overall Performance): {mean2:.2f}%")
+    print(f"-> Standard Deviation (Score Consistency): {std_dev2:.2f}")
+    print(f"-> Final Cumulative Average (Trend Index): {final_trend2:.2f}%")
+    
+    print("\n--- Insight ---")
+    if final_trend1 > final_trend2:
+        print(f"The trend for {student1_name} is currently stronger than {student2_name}.")
+    elif final_trend2 > final_trend1:
+        print(f"The trend for {student2_name} is currently stronger than {student1_name}.")
+    else:
+        print("Both students show similar final performance trends.")
+        
+    # Output 2: Text-Based Visualization
+    create_text_chart(student1_data, student2_data, trend_list1, trend_list2, student1_name, student2_name)
+    
+    print("\nAnalysis Complete.")
+
+# --- Example Usage ---
+
+# Define the input data for two students (Input Structure)
+student_alice_data = {
+    'Assignment': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Score': [60, 65, 75, 80, 70, 75, 85, 90, 95, 98] # Alice shows improvement
+}
+
+student_bob_data = {
+    'Assignment': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Score': [95, 90, 85, 88, 80, 82, 78, 75, 70, 65] # Bob shows a decline
+}
+
+# Run the comparison tool
+compare_student_performance(
+    student1_data=student_alice_data,
+    student2_data=student_bob_data, 
+    student1_name="Alice (Improving)", 
+    student2_name="Bob (Declining)"
+)
