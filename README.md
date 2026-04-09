@@ -55,7 +55,11 @@ Comparative analysis of two students
 This project demonstrates how AI can be used to analyze student performance effectively. It helps in understanding learning patterns and can be useful for improving academic outcomes.
 
 🔮 Future Scope
+
 Add more students for analysis
+
 Use advanced machine learning models
+
 Predict future performance
+
 Integrate with a real-time dashboard
