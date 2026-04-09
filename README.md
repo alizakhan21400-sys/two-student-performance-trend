@@ -16,8 +16,11 @@ To use AI techniques for better insights and predictions
 ⚙️ Technologies Used:
 
 Python
+
 Machine Learning (Basic AI techniques)
+
 Libraries: Pandas, NumPy, Matplotlib
+
 📂 Dataset
 
 The dataset includes:
