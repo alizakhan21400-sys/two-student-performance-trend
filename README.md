@@ -1,5 +1,5 @@
 📊 Student Performance Trend Analysis using AI
-📌 Project Description
+
 
 This project focuses on analyzing and comparing the academic performance of two students using Artificial Intelligence techniques. The main objective is to identify trends, patterns, and changes in their performance over time. By using AI, we can better understand how students improve or decline and what factors may influence their results.
 
