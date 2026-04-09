@@ -6,8 +6,11 @@ This project focuses on analyzing and comparing the academic performance of two 
 🎯 Objectives:    
 
 To analyze the performance data of two students
+
 To identify trends such as improvement or decline
+
 To compare performance between students
+
 To use AI techniques for better insights and predictions
 
 ⚙️ Technologies Used:
